@@ -11,4 +11,12 @@ export default class Renderer {
     this.ctx.fillStyle = color;
     this.ctx.fill(path);
   }
+
+  clear() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  draw(obj) {
+    obj.draw(this.ctx);
+  }
 }
