@@ -20,7 +20,7 @@ engine.communicator.addReceiver('state.server', (state) => {
   field.pos = state;
 });
 
-engine.addCalculator((delta) => {
+engine.addUpdater('main', (delta) => {
   // console.log('Calculating', delta);
   if (engine.keys.has(68)) field.move(1 * delta, 0);
   if (engine.keys.has(65)) field.move(-1 * delta, 0);
@@ -30,7 +30,7 @@ engine.addCalculator((delta) => {
   engine.communicator.send('state.client');
 });
 
-engine.addRenderer((delta) => {
+engine.addDrawer('main', (delta) => {
   // console.log('Rendering', delta);
   renderer.clear();
   renderer.draw(field);

@@ -3,8 +3,12 @@ import Communicator from './Communicator';
 class Engine {
   constructor(config = {}) {
     this.updater = null;
-    this.renderer = null;
-    this.state = { sender: null, receiver: null };
+    this.renderers = null;
+
+    this.handlers = {
+      updaters: new Map(),
+      drawers: new Map(),
+    };
 
     this.communicator = (config.socket) ? new Communicator(config.socket) : null;
 
@@ -27,20 +31,32 @@ class Engine {
   removeKeyUpListener() { document.removeEventListener('keyup', this.handleKeyUp); }
   handleKeyUp(e) { if (this.keys.has(e.keyCode)) this.keys.delete(e.keyCode); }
 
-  addCalculator(fn) {
-    this.updater = fn;
+  addUpdater(name, fn) {
+    this.handlers.updaters.set(name, fn);
   }
 
-  addRenderer(fn) {
-    this.renderer = fn;
+  removeUpdater(name) {
+    this.handlers.updaters.delete(name);
+  }
+
+  addDrawer(name, fn) {
+    this.handlers.drawers.set(name, fn);
+  }
+
+  removeDrawer(name) {
+    this.handlers.drawers.delete(name);
   }
 
   update(delta) {
-    if (this.updater) this.updater(delta);
+    this.handlers.updaters.forEach((updater) => {
+      updater(delta);
+    });
   }
 
-  render(delta) {
-    if (this.renderer) this.renderer(delta);
+  draw(delta) {
+    this.handlers.drawers.forEach((drawer) => {
+      drawer(delta);
+    });
   }
 
   frame(time) {
@@ -48,13 +64,15 @@ class Engine {
     this.timer.previous = time;
 
     this.update(delta);
-    this.render(delta);
+    this.draw(delta);
 
     if (this.running) window.requestAnimationFrame(this.frame);
   }
 
   start() {
     this.running = true;
+    this.timer.previous = performance.now();
+
     this.addKeyDownListener();
     this.addKeyUpListener();
     window.requestAnimationFrame(this.frame);

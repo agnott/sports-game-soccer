@@ -2,34 +2,35 @@ class Communicator {
   constructor(socket) {
     this.socket = socket;
     this.handlers = {
-      senders: {},
-      receivers: {},
+      senders: new Map(),
+      receivers: new Map(),
     };
   }
 
   send(name) {
-    if (name in this.handlers.senders) {
-      this.socket.emit(name, this.handlers.senders[name]());
-    }
+    const fn = this.handlers.senders.get(name);
+    if (fn) this.socket.emit(name, fn());
   }
 
   addSender(name, fn) {
-    this.handlers.senders[name] = fn;
+    this.handlers.senders.set(name, fn);
   }
 
   removeSender(name) {
-    if (name in this.handlers.senders) delete this.handlers.senders[name];
+    this.handlers.senders.delete(name)
   }
 
   addReceiver(name, fn) {
-    this.handlers.receivers[name] = fn;
+    this.handlers.receivers.set(name, fn);
     this.socket.on(name, fn);
   }
 
   removeReceiver(name) {
-    if (name in this.handlers.receivers) {
-      this.socket.removeListener(name, this.handlers.receivers[name]);
-      delete this.handlers.receivers[name];
+    const fn = this.handlers.receivers.get(name);
+
+    if (fn) {
+      this.socket.removeListener(name, fn);
+      this.handlers.receivers.delete(name);
     }
   }
 }
