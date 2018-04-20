@@ -1,9 +1,11 @@
 import Communicator from './Communicator';
+import Renderer from './Renderer';
+import Interactor from './Interactor';
 
 class Engine {
   constructor(config = {}) {
     this.updater = null;
-    this.renderers = null;
+    this.renderers = new Map();
 
     this.handlers = {
       updaters: new Map(),
@@ -11,25 +13,14 @@ class Engine {
     };
 
     this.communicator = (config.socket) ? new Communicator(config.socket) : null;
+    this.interactor = new Interactor(config.interactor);
 
     this.running = false;
 
     this.timer = { previous: 0 };
 
-    this.keys = new Set();
-
     this.frame = this.frame.bind(this);
-    this.handleKeyDown = this.handleKeyDown.bind(this);
-    this.handleKeyUp = this.handleKeyUp.bind(this);
   }
-
-  addKeyDownListener() { document.addEventListener('keydown', this.handleKeyDown); }
-  removeKeyDownListener() { document.removeEventListener('keydown', this.handleKeyDown); }
-  handleKeyDown(e) { if (!this.keys.has(e.keyCode)) this.keys.add(e.keyCode); }
-
-  addKeyUpListener() { document.addEventListener('keyup', this.handleKeyUp); }
-  removeKeyUpListener() { document.removeEventListener('keyup', this.handleKeyUp); }
-  handleKeyUp(e) { if (this.keys.has(e.keyCode)) this.keys.delete(e.keyCode); }
 
   addUpdater(name, fn) {
     this.handlers.updaters.set(name, fn);
@@ -45,6 +36,17 @@ class Engine {
 
   removeDrawer(name) {
     this.handlers.drawers.delete(name);
+  }
+
+  addRenderer(name, id) {
+    if (!id) id = name;
+    const r = new Renderer(id);
+    this.renderers.set(name, r);
+    return r;
+  }
+
+  removeRenderer(name) {
+    this.renderers.delete(name);
   }
 
   update(delta) {
@@ -72,16 +74,13 @@ class Engine {
   start() {
     this.running = true;
     this.timer.previous = performance.now();
-
-    this.addKeyDownListener();
-    this.addKeyUpListener();
+    this.interactor.start();
     window.requestAnimationFrame(this.frame);
   }
 
   stop(cb) {
     this.running = false;
-    this.removeKeyDownListener();
-    this.removeKeyUpListener();
+    this.interactor.stop();
     if (cb) cb();
   }
 };

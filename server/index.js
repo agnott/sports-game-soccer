@@ -16,7 +16,7 @@ io.on('connection', (socket) => {
   socket.on('state.client', (state) => {
     console.log('received state')
     const computed = adjust(state);
-    socket.emit('state.server', computed);
+    // socket.emit('state.server', computed);
   });
 });
 

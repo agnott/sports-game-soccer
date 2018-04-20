@@ -2,6 +2,11 @@ export default class Renderer {
   constructor(id) {
     this.canvas = document.getElementById(id);
     this.ctx = this.canvas.getContext('2d');
+
+    this.dims = {
+      width: this.canvas.width,
+      height: this.canvas.height,
+    };
   }
 
   drawRect(x, y, width, height, color) {
@@ -17,6 +22,6 @@ export default class Renderer {
   }
 
   draw(obj) {
-    obj.draw(this.ctx);
+    obj.draw(this.ctx, this.canvas);
   }
 }
