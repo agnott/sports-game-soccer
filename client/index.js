@@ -72,8 +72,6 @@ engine.addUpdater('main', (delta) => {
     );
   }
 
-  console.log(player.isColliding(ball));
-
   engine.communicator.send('state.client');
 });
 

@@ -8,24 +8,57 @@ export default class PhysicsObject {
       height: config.dims.height,
       radius: config.dims.radius,
     };
+    // this.pos = {
+    //   x: config.pos.x,
+    //   y: config.pos.y,
+    // };
+    // this.transform = {
+    //   rotation: 0,
+    // };
+    // this.last = {
+    //   pos: this.pos,
+    // };
+    // this.movement = {
+    //   source: { x: 0, y: 0 },
+    //   unit: { x: 0, y: 0 },
+    //   magnitude: 0,
+    // };
     this.pos = {
-      x: config.pos.x,
-      y: config.pos.y,
+      x: config.pos.x || 0,
+      y: config.pos.y || 0,
     };
-    this.transform = {
-      rotation: 0,
+    this.transform = { rotation: 0 };
+    this.vectors = {
+      velocity: { x: 0, y: 0 },
+    };
+  }
+
+  updateMovementVector() {
+    const mx = this.pos.x - this.last.pos.x;
+    const my = this.pos.y - this.last.pos.y;
+
+    this.vectors = {
+      velocity: { x: mx, y: my },
     };
   }
 
   shift(x, y) {
+    this.last.pos = this.pos;
     this.pos = {
       x: this.pos.x + x || 0,
       y: this.pos.y + y || 0,
     };
+    this.updateMovementVector();
   }
 
   move(x, y) {
+    this.last.pos = this.pos;
     this.pos = {x, y};
+    this.updateMovementVector();
+  }
+
+  applyForce(vec) {
+    
   }
 
   rotate(rads) {

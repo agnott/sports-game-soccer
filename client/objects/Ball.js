@@ -10,11 +10,10 @@ export default class Ball extends PhysicsObject {
     });
     this.path = new Path2D();
     this.path.ellipse(0, 0, 10, 10, 0, 0, 2 * Math.PI);
-    this.path.ellipse(0, 0 - 10, 5, 5, 0, 0, 2 * Math.PI);
   }
   draw(ctx, canvas) {
     ctx.translate(this.pos.x, this.pos.y);
-    ctx.fillStyle = Color.rgb(75, 75, 200);
+    ctx.fillStyle = Color.rgb(255, 255, 255);
     ctx.fill(this.path);
     ctx.resetTransform();
   }
